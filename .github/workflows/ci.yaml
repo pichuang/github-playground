@@ -47,7 +47,8 @@ jobs:
             destination-github-username: 'pichuang'
             destination-repository-name: 'github-playground-site'
             user-email: 'github-actions[bot]'
-            target-branch: main
+            target-branch: gh-pages
+            create-target-branch-if-needed: true
 
 
 
