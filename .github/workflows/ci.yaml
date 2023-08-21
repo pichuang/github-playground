@@ -4,6 +4,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   deploy-mkdocs-material:
     runs-on: ubuntu-latest
@@ -13,3 +16,39 @@ jobs:
         - uses: actions/setup-python@v4
           with:
             python-version: 3.9
+
+        - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+
+        - uses: actions/cache@v3
+          with:
+            key: mkdocs-material-${{ env.cache_id }}
+            path: .cache
+            restore-keys: |
+              mkdocs-material-
+
+        - run: pip install mkdocs-material
+
+        - name: Build GitHub Site
+          run: |
+            pwd && mkdocs build \
+              --config-file mkdocs.yml \
+              --site-dir site
+
+        - name: List Directory
+          run: |
+            ls -la && cd site && ls -la
+
+        - name: Pushes to github-playground-site
+          uses: cpina/github-action-push-to-another-repository@main
+          env:
+            API_TOKEN_GITHUB: ${{ secrets.TEST_TOKEN }}
+          with:
+            source-directory: 'site'
+            destination-github-username: 'pichuang'
+            destination-repository-name: 'github-playground-site'
+            user-email: 'github-actions[bot]'
+            target-branch: main
+
+
+
+
